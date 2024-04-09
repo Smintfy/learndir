@@ -14,7 +14,6 @@ import (
 nil != null
 */
 
-
 type Node struct {
 	data int
 	next *Node
@@ -40,7 +39,6 @@ func (list *LinkedList) append(data int) {
 	for current.next != nil {
 		current = current.next
 	}
-
 	current.next = newNode
 }
 
@@ -58,6 +56,36 @@ func (list *LinkedList) push(data int) {
 	// and the list head refers to the new node
 	newNode := &Node{data: data, next: list.head}
 	list.head = newNode
+}
+
+func (list *LinkedList) insertAt(index int, data int) {
+	if index > list.len() || index < 0 {
+		println("index out of bound")
+		return
+	}
+
+	newNode := &Node{data: data, next: nil}
+	
+	// insert at the beginning
+	if index == 0 {
+		newNode.next = list.head
+		list.head = newNode
+		return
+	}
+
+	current := list.head
+	count := 0
+	for current != nil {
+		// [x_cur] -> [new] -> [x_next]
+		// we are inserting the value between current node and the next node of the current node
+		if count + 1 == index {
+			newNode.next = current.next // [new] -> [x_next]
+			current.next = newNode // [x_cur] -> [new]
+			return
+		}
+		current = current.next
+		count++
+	}
 }
 
 // delete the last node of the linked list
@@ -89,6 +117,30 @@ func (list *LinkedList) pop() (int, error) {
 	return d, nil
 }
 
+// returns a new linked list with an element that is common to all linked list
+// X = [1] -> [3] -> [5] -> [7] -> [9]
+// Y = [2] -> [3] -> [6] -> [9] -> [14]
+// X intersect Y = [3] -> [9]
+func (list *LinkedList) intersect(otherList *LinkedList) (*LinkedList, error) {
+	intersectNode := &LinkedList{}
+
+	// TODO
+
+	return intersectNode, nil
+}
+
+// returns a new linked list that contains all the items from the original linked list.
+// X = [1] -> [3] -> [5] -> [7] -> [9]
+// Y = [2] -> [3] -> [6] -> [9] -> [14]
+// X union Y = [1] -> [2] -> [3] -> [5] -> [6] -> [7] -> [9] -> [14]
+func (list *LinkedList) union(otherList *LinkedList) (*LinkedList, error) {
+	unionNode := &LinkedList{}
+
+	// TODO
+
+	return unionNode, nil
+}
+
 // print out the linked list
 // x1 -> ... -> xi -> nil
 func (list *LinkedList) print() {
@@ -106,8 +158,8 @@ func (list *LinkedList) len() int {
 	count := 0
 	current := list.head
 	for current != nil {
-		count++
 		current = current.next
+		count++
 	}
 	return count
 }
@@ -143,6 +195,12 @@ func main() {
 	fmt.Printf("\n\nDeleting last node: \n")
 
 	linkedList.pop()
+	linkedList.print()
+	fmt.Printf("The length of list: %d\n", linkedList.len())
+
+	fmt.Printf("\n\nInserting: \n")
+
+	linkedList.insertAt(3, 19)
 	linkedList.print()
 	fmt.Printf("The length of list: %d\n", linkedList.len())
 }
