@@ -123,26 +123,27 @@ func (list *LinkedList[T]) Pop() (T, error) {
 // Y = [2] -> [3] -> [6] -> [9] -> [14]
 // X intersect Y = [3] -> [9]
 func (list *LinkedList[T]) Intersect(otherList *LinkedList[T]) (*LinkedList[T]) {
-	// if the other list is bigger then we switch for X and Y
-	if list.Length() < otherList.Length() {
-		temp := list
-		list = otherList
-		otherList = temp
-	}
-
-	// this shit is O(n^2)
-	// compare each of the bigger list value to the each of the smaller list value
+	// count the occurrences of the node value in list
+	visited := make(map[T]int)
 	intersectNode := &LinkedList[T]{}
+
+	// we visit every node in X
+	// increment the count value on each visit
 	X := list.head
 	for X != nil {
-		Y := otherList.head
-		for Y != nil {
-			if Y.data == X.data {
-				intersectNode.Append(Y.data)
-			}
-			Y = Y.next
-		}
+		visited[X.data]++
 		X = X.next
+	}
+
+	// we compare every visited node to the Y node
+	Y := otherList.head
+	for Y != nil {
+		if k, v := visited[Y.data]; v && k > 0 {
+			intersectNode.Push(Y.data)
+			// decrement after pushing the data so no duplicate occurs
+			visited[Y.data]--
+		}
+		Y = Y.next
 	}
 	return intersectNode
 }
@@ -244,12 +245,12 @@ func main() {
 	A := &LinkedList[int]{}
 	B := &LinkedList[int]{}
 
-	A_datas := [5]int{1, 8, 3, 4, 5}
+	A_datas := [6]int{1, 8, 3, 4, 5, 4}
 	for _, data := range A_datas {
 		A.Append(data)
 	}
 
-	B_datas := [6]int{6, 4, 7, 3, 1, 8}
+	B_datas := [4]int{6, 4, 8, 8}
 	for _, data := range B_datas {
 		B.Append(data)
 	}
