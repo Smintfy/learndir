@@ -25,7 +25,7 @@ type LinkedList[T comparable] struct {
 
 // add data at the back of the linked list
 // O(n) as we need to traverse through the list to find the last node
-func (list *LinkedList[T]) append(data T) {
+func (list *LinkedList[T]) Append(data T) {
 	newNode := &Node[T]{data: data}
 
 	// new entry
@@ -44,7 +44,7 @@ func (list *LinkedList[T]) append(data T) {
 
 // add data at the front of the linked list
 // O(1) as we just need to perform constant operations of adding the new Node
-func (list *LinkedList[T]) push(data T) {
+func (list *LinkedList[T]) Push(data T) {
 	// new entry
 	if list.head == nil {
 		newNode := &Node[T]{data: data}
@@ -60,8 +60,8 @@ func (list *LinkedList[T]) push(data T) {
 
 // add data at a specified index of a list
 // O(n)
-func (list *LinkedList[T]) insertAt(index int, data T) (error) {
-	if index > list.len() || index < 0 {
+func (list *LinkedList[T]) InsertAt(index int, data T) (error) {
+	if index > list.Length() || index < 0 {
 		return errors.New("index out of bound")
 	}
 
@@ -91,7 +91,7 @@ func (list *LinkedList[T]) insertAt(index int, data T) (error) {
 }
 
 // delete the last node of the linked list
-func (list *LinkedList[T]) pop() (T, error) {
+func (list *LinkedList[T]) Pop() (T, error) {
 	if list.head == nil {
 		var t T
 		return t, errors.New("linked list is empty")
@@ -122,9 +122,9 @@ func (list *LinkedList[T]) pop() (T, error) {
 // X = [1] -> [3] -> [5] -> [7] -> [9]
 // Y = [2] -> [3] -> [6] -> [9] -> [14]
 // X intersect Y = [3] -> [9]
-func (list *LinkedList[T]) intersect(otherList *LinkedList[T]) (*LinkedList[T]) {
+func (list *LinkedList[T]) Intersect(otherList *LinkedList[T]) (*LinkedList[T]) {
 	// if the other list is bigger then we switch for X and Y
-	if list.len() < otherList.len() {
+	if list.Length() < otherList.Length() {
 		temp := list
 		list = otherList
 		otherList = temp
@@ -138,7 +138,7 @@ func (list *LinkedList[T]) intersect(otherList *LinkedList[T]) (*LinkedList[T]) 
 		Y := otherList.head
 		for Y != nil {
 			if Y.data == X.data {
-				intersectNode.append(Y.data)
+				intersectNode.Append(Y.data)
 			}
 			Y = Y.next
 		}
@@ -151,7 +151,7 @@ func (list *LinkedList[T]) intersect(otherList *LinkedList[T]) (*LinkedList[T]) 
 // X = [1] -> [3] -> [5] -> [7] -> [9]
 // Y = [2] -> [3] -> [6] -> [9] -> [14]
 // X union Y = [1] -> [2] -> [3] -> [5] -> [6] -> [7] -> [9] -> [14]
-func (list *LinkedList[T]) union(otherList *LinkedList[T]) (*LinkedList[T]) {
+func (list *LinkedList[T]) Union(otherList *LinkedList[T]) (*LinkedList[T]) {
 	visited := make(map[T]bool)
 	unionNode := &LinkedList[T]{}
 
@@ -160,7 +160,7 @@ func (list *LinkedList[T]) union(otherList *LinkedList[T]) (*LinkedList[T]) {
 	X := list.head
 	for X != nil {
 		if !visited[X.data] {
-			unionNode.append(X.data)
+			unionNode.Append(X.data)
 			visited[X.data] = true
 		}
 		X = X.next
@@ -170,7 +170,7 @@ func (list *LinkedList[T]) union(otherList *LinkedList[T]) (*LinkedList[T]) {
 	Y := otherList.head
 	for Y != nil {
 		if !visited[Y.data] {
-			unionNode.append(Y.data)
+			unionNode.Append(Y.data)
 			visited[Y.data] = true
 		}
 		Y = Y.next
@@ -180,10 +180,10 @@ func (list *LinkedList[T]) union(otherList *LinkedList[T]) (*LinkedList[T]) {
 
 // print out the linked list
 // x1 -> ... -> xi -> nil
-func (list *LinkedList[T]) print() {
+func (list *LinkedList[T]) Print() {
 	current := list.head
 	for current != nil {
-		fmt.Printf("%v -> ", current.data)
+		fmt.Printf("%v->", current.data)
 		current = current.next
 	}
 	fmt.Printf("nil")
@@ -191,7 +191,7 @@ func (list *LinkedList[T]) print() {
 }
 
 // get the length of the linked list
-func (list *LinkedList[T]) len() int {
+func (list *LinkedList[T]) Length() int {
 	count := 0
 	current := list.head
 	for current != nil {
@@ -208,62 +208,62 @@ func main() {
 
 	// populate
 	for _, data := range datas {
-		linkedList.append(data)
+		linkedList.Append(data)
 	}
-	linkedList.print()
-	fmt.Printf("The length of list: %d\n", linkedList.len())
+	linkedList.Print()
+	fmt.Printf("The length of list: %d\n", linkedList.Length())
 
 	// data reserved for testing the append
 	d_append := 13
 	fmt.Printf("\n\nAppending %d: \n", d_append)
 
-	linkedList.append(d_append)
-	linkedList.print()
-	fmt.Printf("The length of list: %d\n", linkedList.len())
+	linkedList.Append(d_append)
+	linkedList.Print()
+	fmt.Printf("The length of list: %d\n", linkedList.Length())
 
 	// data reserved for testing the push
 	d_push := 17
 	fmt.Printf("\n\nPushing %d: \n", d_push)
 
-	linkedList.push(d_push)
-	linkedList.print()
-	fmt.Printf("The length of list: %d\n", linkedList.len())
+	linkedList.Push(d_push)
+	linkedList.Print()
+	fmt.Printf("The length of list: %d\n", linkedList.Length())
 
 	fmt.Printf("\n\nDeleting last node: \n")
 
-	linkedList.pop()
-	linkedList.print()
-	fmt.Printf("The length of list: %d\n", linkedList.len())
+	linkedList.Pop()
+	linkedList.Print()
+	fmt.Printf("The length of list: %d\n", linkedList.Length())
 
 	fmt.Printf("\n\nInserting: \n")
 
-	linkedList.insertAt(3, 19)
-	linkedList.print()
-	fmt.Printf("The length of list: %d\n", linkedList.len())
+	linkedList.InsertAt(3, 19)
+	linkedList.Print()
+	fmt.Printf("The length of list: %d\n", linkedList.Length())
 
 	A := &LinkedList[int]{}
 	B := &LinkedList[int]{}
 
 	A_datas := [5]int{1, 8, 3, 4, 5}
 	for _, data := range A_datas {
-		A.append(data)
+		A.Append(data)
 	}
 
 	B_datas := [6]int{6, 4, 7, 3, 1, 8}
 	for _, data := range B_datas {
-		B.append(data)
+		B.Append(data)
 	}
 
 	fmt.Printf("\n\nA & B:\n")
-	A.print()
-	B.print()
+	A.Print()
+	B.Print()
 
-	C := A.intersect(B)
+	C := A.Intersect(B)
 
 	fmt.Printf("\nIntersect: \n")
-	C.print()
+	C.Print()
 
-	D := A.union(B)
+	D := A.Union(B)
 	fmt.Printf("\nUnion: \n")
-	D.print()
+	D.Print()
 }
