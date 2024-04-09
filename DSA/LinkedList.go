@@ -14,19 +14,19 @@ import (
 nil != null
 */
 
-type Node struct {
-	data int
-	next *Node
+type Node[T comparable] struct {
+	data T
+	next *Node[T]
 }
 
-type LinkedList struct {
-	head *Node
+type LinkedList[T comparable] struct {
+	head *Node[T]
 }
 
 // add data at the back of the linked list
 // O(n) as we need to traverse through the list to find the last node
-func (list *LinkedList) append(data int) {
-	newNode := &Node{data: data, next: nil}
+func (list *LinkedList[T]) append(data T) {
+	newNode := &Node[T]{data: data}
 
 	// new entry
 	if list.head == nil {
@@ -44,33 +44,34 @@ func (list *LinkedList) append(data int) {
 
 // add data at the front of the linked list
 // O(1) as we just need to perform constant operations of adding the new Node
-func (list *LinkedList) push(data int) {
+func (list *LinkedList[T]) push(data T) {
 	// new entry
 	if list.head == nil {
-		newNode := &Node{data: data, next: nil}
+		newNode := &Node[T]{data: data}
 		list.head = newNode
 		return 
 	}
 
 	// the new node points to the list head
 	// and the list head refers to the new node
-	newNode := &Node{data: data, next: list.head}
+	newNode := &Node[T]{data: data, next: list.head}
 	list.head = newNode
 }
 
-func (list *LinkedList) insertAt(index int, data int) {
+// add data at a specified index of a list
+// O(n)
+func (list *LinkedList[T]) insertAt(index int, data T) (error) {
 	if index > list.len() || index < 0 {
-		println("index out of bound")
-		return
+		return errors.New("index out of bound")
 	}
 
-	newNode := &Node{data: data, next: nil}
+	newNode := &Node[T]{data: data}
 	
 	// insert at the beginning
 	if index == 0 {
 		newNode.next = list.head
 		list.head = newNode
-		return
+		return nil
 	}
 
 	current := list.head
@@ -81,17 +82,19 @@ func (list *LinkedList) insertAt(index int, data int) {
 		if count + 1 == index {
 			newNode.next = current.next // [new] -> [x_next]
 			current.next = newNode // [x_cur] -> [new]
-			return
+			return nil
 		}
 		current = current.next
 		count++
 	}
+	return nil
 }
 
 // delete the last node of the linked list
-func (list *LinkedList) pop() (int, error) {
+func (list *LinkedList[T]) pop() (T, error) {
 	if list.head == nil {
-		return 0, errors.New("linked list is empty")
+		var t T
+		return t, errors.New("linked list is empty")
 	}
 
 	// if the list length is 1
@@ -100,7 +103,6 @@ func (list *LinkedList) pop() (int, error) {
 	if list.head.next == nil {
 		d := list.head.data 
 		list.head = nil
-		fmt.Println("successfully deleted last node")
 		return d, nil
 	}
 
@@ -113,7 +115,6 @@ func (list *LinkedList) pop() (int, error) {
 	}
 	d := current.next.data
 	current.next = nil
-	fmt.Println("successfully deleted last node")
 	return d, nil
 }
 
@@ -121,32 +122,68 @@ func (list *LinkedList) pop() (int, error) {
 // X = [1] -> [3] -> [5] -> [7] -> [9]
 // Y = [2] -> [3] -> [6] -> [9] -> [14]
 // X intersect Y = [3] -> [9]
-func (list *LinkedList) intersect(otherList *LinkedList) (*LinkedList, error) {
-	intersectNode := &LinkedList{}
+func (list *LinkedList[T]) intersect(otherList *LinkedList[T]) (*LinkedList[T]) {
+	// if the other list is bigger then we switch for X and Y
+	if list.len() < otherList.len() {
+		temp := list
+		list = otherList
+		otherList = temp
+	}
 
-	// TODO
-
-	return intersectNode, nil
+	// this shit is O(n^2)
+	// compare each of the bigger list value to the each of the smaller list value
+	intersectNode := &LinkedList[T]{}
+	X := list.head
+	for X != nil {
+		Y := otherList.head
+		for Y != nil {
+			if Y.data == X.data {
+				intersectNode.append(Y.data)
+			}
+			Y = Y.next
+		}
+		X = X.next
+	}
+	return intersectNode
 }
 
 // returns a new linked list that contains all the items from the original linked list.
 // X = [1] -> [3] -> [5] -> [7] -> [9]
 // Y = [2] -> [3] -> [6] -> [9] -> [14]
 // X union Y = [1] -> [2] -> [3] -> [5] -> [6] -> [7] -> [9] -> [14]
-func (list *LinkedList) union(otherList *LinkedList) (*LinkedList, error) {
-	unionNode := &LinkedList{}
+func (list *LinkedList[T]) union(otherList *LinkedList[T]) (*LinkedList[T]) {
+	visited := make(map[T]bool)
+	unionNode := &LinkedList[T]{}
 
-	// TODO
+	// we visit every node in X
+	// marking every unique value as visited so there are no duplicates
+	X := list.head
+	for X != nil {
+		if !visited[X.data] {
+			unionNode.append(X.data)
+			visited[X.data] = true
+		}
+		X = X.next
+	}
 
-	return unionNode, nil
+	// now we just find Y node value that is not exist on the visited map
+	Y := otherList.head
+	for Y != nil {
+		if !visited[Y.data] {
+			unionNode.append(Y.data)
+			visited[Y.data] = true
+		}
+		Y = Y.next
+	}
+	return unionNode
 }
 
 // print out the linked list
 // x1 -> ... -> xi -> nil
-func (list *LinkedList) print() {
+func (list *LinkedList[T]) print() {
 	current := list.head
 	for current != nil {
-		fmt.Printf("%d -> ", current.data)
+		fmt.Printf("%v -> ", current.data)
 		current = current.next
 	}
 	fmt.Printf("nil")
@@ -154,7 +191,7 @@ func (list *LinkedList) print() {
 }
 
 // get the length of the linked list
-func (list *LinkedList) len() int {
+func (list *LinkedList[T]) len() int {
 	count := 0
 	current := list.head
 	for current != nil {
@@ -165,7 +202,7 @@ func (list *LinkedList) len() int {
 }
 
 func main() {
-	linkedList := &LinkedList{}
+	linkedList := &LinkedList[int]{}
 
 	datas := [5]int{2, 3, 5, 7, 11}
 
@@ -203,4 +240,30 @@ func main() {
 	linkedList.insertAt(3, 19)
 	linkedList.print()
 	fmt.Printf("The length of list: %d\n", linkedList.len())
+
+	A := &LinkedList[int]{}
+	B := &LinkedList[int]{}
+
+	A_datas := [5]int{1, 8, 3, 4, 5}
+	for _, data := range A_datas {
+		A.append(data)
+	}
+
+	B_datas := [6]int{6, 4, 7, 3, 1, 8}
+	for _, data := range B_datas {
+		B.append(data)
+	}
+
+	fmt.Printf("\n\nA & B:\n")
+	A.print()
+	B.print()
+
+	C := A.intersect(B)
+
+	fmt.Printf("\nIntersect: \n")
+	C.print()
+
+	D := A.union(B)
+	fmt.Printf("\nUnion: \n")
+	D.print()
 }
